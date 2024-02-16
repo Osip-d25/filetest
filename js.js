@@ -1,38 +1,20 @@
-const locationInfo = document.getElementById("location-info");
-const getLocationBtn = document.getElementById("get-location");
+const emailInfo = document.getElementById("email-info");
+const sendEmailBtn = document.getElementById("send-email");
 
-getLocationBtn.addEventListener("click", () => {
-    navigator.geolocation.getCurrentPosition((position) => {
-        const latitude = position.coords.latitude;
-        const longitude = position.coords.longitude;
+sendEmailBtn.addEventListener("click", () => {
+    const email = "osip.1942@gmail.com";
+    const subject = "Тестовое письмо";
+    const body = "Это тестовое письмо, отправленное с помощью JavaScript.";
 
-        // Отправка данных на почту
-        const email = "osip.1942@gmail.com";
-        const subject = "Мое местоположение";
-        const body = `Широта: ${latitude}, Долгота: ${longitude}`;
-
-        // **Замените этот код на ваш API для отправки почты**
-         fetch("https://osip-d25.github.io/filetest/", {
-             method: "POST",
-           headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                email,
-               subject,
-                 body,
-            }),
-       });
-
-        locationInfo.innerHTML = `
-            <p>Ваше местоположение:</p>
-            <ul>
-                <li>Широта: ${latitude}</li>
-                <li>Долгота: ${longitude}</li>
-            </ul>
-        `;
-    }, (error) => {
-        console.log(`Ошибка при получении местоположения: ${error.message}`);
-        locationInfo.innerHTML = `<p>Ошибка при получении местоположения</p>`;
-    });
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "https://osip-d25.github.io/filetest/");
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.onload = () => {
+        if (xhr.status === 200) {
+            emailInfo.innerHTML = `<p>Письмо успешно отправлено!</p>`;
+        } else {
+            emailInfo.innerHTML = `<p>Ошибка при отправке письма: ${xhr.statusText}</p>`;
+        }
+    };
+    xhr.send(JSON.stringify({ email, subject, body }));
 });
